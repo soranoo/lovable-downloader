@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Lovable Downloader</title>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 320px;
+      padding: 15px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      margin: 0;
+      color: #333;
+    }
+
+    .status {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      background-color: #f5f5f5;
+      font-size: 14px;
+    }
+
+    .status-error {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+
+    .status-success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .status-warning {
+      background-color: #fff3e0;
+      color: #ef6c00;
+    }
+
+    .project-info {
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .project-info div {
+      display: flex;
+      margin-bottom: 5px;
+    }
+
+    .project-info .label {
+      width: 80px;
+      color: #666;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px 15px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button:hover {
+      background-color: #3a7bca;
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    button svg {
+      margin-right: 8px;
+    }
+
+    .help-text {
+      font-size: 12px;
+      color: #666;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>Lovable Downloader</h1>
+  </div>
+
+  <div id="status" class="status">
+    Checking page status...
+  </div>
+
+  <div id="project-info" class="project-info" style="display: none;">
+    <div>
+      <span class="label">Project ID:</span>
+      <span id="project-id">-</span>
+    </div>
+    <div>
+      <span class="label">Status:</span>
+      <span id="token-status">-</span>
+    </div>
+  </div>
+
+  <button id="download-project" disabled>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+    Download Project
+  </button>
+
+  <div id="help-text" class="help-text">
+    This extension works only on lovable.dev project pages.
+  </div>
+
+  <a class="help-text" style="text-align: center; margin-top: 10px; font-style: italic;"
+    href="https://github.com/soranoo/loveable-downloader" target="_blank">
+    Created by soranoo
+  </a>
+
+  <script src="plugins/jszip.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+
+</html>

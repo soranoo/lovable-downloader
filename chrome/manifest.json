@@ -1,0 +1,41 @@
+{
+  "name": "Lovable Downloader",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "Downloads source code from lovable.dev with a single click",
+  "author": "Freeman (soranoo)",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://lovable.dev/*",
+    "https://lovable-api.com/*"
+  ],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://lovable.dev/projects/*"],
+      "js": ["content-script.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "plugins/*.js",
+        "injections/*.js"
+      ],
+      "matches": ["https://lovable.dev/*"]
+    }
+  ]
+}

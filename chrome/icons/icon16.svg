@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+  <!-- Lovable Heart Base -->
+  <g transform="scale(0.06)">
+    <path fill="#FF1814" d="M128 227.734q-3.84 0-7.734-1.388a18 18 0 0 1-6.772-4.266l-18.668-17.174q-37.76-34.88-66.292-67.36Q0 105.065 0 68.48q0-29.226 19.626-48.854Q39.255 0 68.266 0q16.533 0 32.214 7.626Q116.16 15.254 128 31.36q12.906-16.105 27.946-23.734Q170.986 0 187.734 0q29.012 0 48.64 19.626Q256 39.254 256 68.48q0 36.585-28.48 69.12t-66.454 67.414l-18.56 17.066a18 18 0 0 1-6.772 4.266q-3.894 1.388-7.734 1.388"></path>
+    <ellipse cx="163.767" cy="278.083" fill="#FFAB25" rx="96.787" ry="98.052" transform="rotate(-105 163.767 278.083)" opacity="0.6"></ellipse>
+    <ellipse cx="224.872" cy="261.709" fill="#FFAB25" rx="96.787" ry="98.052" transform="rotate(-105 224.872 261.709)" opacity="0.6"></ellipse>
+    <ellipse cx="69.918" cy="172.247" fill="#FFAB25" rx="96.787" ry="98.052" transform="rotate(-105 69.918 172.247)" opacity="0.6"></ellipse>
+    <ellipse cx="131.022" cy="155.873" fill="#FFAB25" rx="96.787" ry="98.052" transform="rotate(-105 131.022 155.873)" opacity="0.6"></ellipse>
+    <ellipse cx="81.517" cy="70.524" fill="#00C986" rx="81.517" ry="70.524" transform="matrix(-.67039 -.742 .73084 -.68255 206.356 122.303)" opacity="0.6"></ellipse>
+    <ellipse cx="91.894" cy="79.446" fill="#297FFF" rx="91.894" ry="79.446" transform="matrix(-.67039 -.742 .73084 -.68255 255.859 191.054)" opacity="0.6"></ellipse>
+  </g>
+  
+  <!-- Download Arrow Overlay -->
+  <path d="M8 9.5l2.5-2.5M8 9.5l-2.5-2.5M8 9.5V3.5M4 12h8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
