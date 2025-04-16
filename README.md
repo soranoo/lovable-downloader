@@ -27,17 +27,29 @@ If you are using the Chrome extension, you can also download the source code by 
 
 #### Via Chrome Web Store
 
-Coming soon!
+They rejected~.
+
+#### Via Chrome Extension
+
+1. Clone the repository.
+
+   ```bash
+   git clone https://github.com/soranoo/loveable-downloader.git
+   ```
+2. Open Chrome and go to `chrome://extensions/`.
+3. Enable "Developer mode" in the top right corner.
+4. Click on "Load unpacked" and select the `chrome` folder in the cloned repository.
+5. Switch on the extension.
+![Screenshot](docs/images/screenshot-3.png)
+6. Reload the Loveable page.
+   
 
 #### Via Tampermonkey
 
 1. Install [Tampermonkey](https://www.tampermonkey.net/) extension for your browser.
-
 2. Install the script by clicking on the Tampermonkey icon in your browser and selecting "Add new script".
    Then paste the code from the [`tampermonkey/tampermonkey.js`](tampermonkey/tampermonkey.js) file into the editor and save it.
-
 3. Switch on the script in Tampermonkey.
-
 4. Reload the Loveable page.
 
 ## ⭐ TODO
