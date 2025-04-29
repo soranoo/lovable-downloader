@@ -187,6 +187,7 @@
             log.info("idToken found in credentialIdToken.");
             return credentialIdToken;
         }
+        log.info("CredentialIdToken not found, checking 3rd-party auth...");
   
         const thirdPartyIdToken = get3rdAuthIdToken();
         if (thirdPartyIdToken) {

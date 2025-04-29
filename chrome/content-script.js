@@ -58,56 +58,25 @@ function injectScript(scriptPath) {
 }
 
 // Extract token from the DOM
-function getCredentialIdToken () {
-  // Look through all script tags in the document
+function getIdTokenFromDom() {
+  log.debug("Searching for idToken...");
   const scripts = document.querySelectorAll('script');
-  // Regex pattern to match idToken in serialized JSON
   const regex = /\\"idToken\\":\\"([A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+)\\"/;
   
   for (const script of scripts) {
-      const content = script.textContent;
-      if (content) {
-          const match = content.match(regex);
-          if (match?.[1]) {
-              log.info("idToken found.");
-              log.debug(`Token: ${match[1].substring(0, 20)}...`);
-              return match[1];
-          }
+    const content = script.textContent;
+    if (content) {
+      const match = content.match(regex);
+      if (match?.[1]) {
+        log.info("idToken found.");
+        log.debug(`Token: ${match[1].substring(0, 20)}...`);
+        return match[1];
       }
+    }
   }
   
+  log.error("idToken not found.");
   return null;
-}
-
-function get3rdAuthIdToken () {
-  const jwtPart1 =  __next_f[13][1].match(/(eyJ[\w|.]+)/)?.[0] || null;
-  if (!jwtPart1) {
-      return null;
-  }
-  const jwtPart2 = __next_f[14][1];
-  const jwt = jwtPart1 + jwtPart2;
-  return jwt;
-}
-
-function getIdTokenFromDom() {
-    log.debug("Searching for idToken...");
-    
-    const credentialIdToken = getCredentialIdToken();
-    if (credentialIdToken) {
-        log.info("idToken found in credentialIdToken.");
-        return credentialIdToken;
-    }
-    log.info("CredentialIdToken not found, checking 3rd-party auth...");
-
-    const thirdPartyIdToken = get3rdAuthIdToken();
-    if (thirdPartyIdToken) {
-        log.info("idToken found in third-party auth.");
-        return thirdPartyIdToken;
-    }
-    
-    // If we reach here, token wasn't found
-    log.error("idToken not found.");
-    return null;
 }
 
 // Extract project ID from URL
