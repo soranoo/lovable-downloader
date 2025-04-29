@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Lovable Downloader (v1.12 - Loading Indicator)
+// @name         Lovable Downloader (v1.13 - Fix 3rd-party token extraction)
 // @namespace    https://github.com/soranoo/lovable-downloader
-// @version      1.12
-// @description  Adds download buttons, fetches code on demand, shows loading indicator instead of alerts.
+// @version      1.13
+// @description  Fix incorrect 3rd-party auth token extraction.
 // @author       Freeman (soranoo)
 // @match        https://lovable.dev/projects/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=lovable.dev
@@ -141,13 +141,63 @@
   }
 
 
-  // --- Utility Functions --- (getProjectIdFromUrl, getIdTokenFromDom, base64ToBlob, triggerDownload)
+  // --- Utility Functions --- (getProjectIdFromUrl, base64ToBlob, triggerDownload)
   // Keep these as they were
   function getProjectIdFromUrl() { const m=window.location.pathname.match(/\/projects\/([a-f0-9-]+)/i); if(m?.[1]){log.debug(`Project ID: ${m[1]}`);return m[1];}else{log.warn("Project ID not found.");return null;} }
-  function getIdTokenFromDom() { log.debug("Searching for idToken..."); const s=document.querySelectorAll('script'), r=/\\"idToken\\":\\"([A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+)\\"/; for (const t of s){const c=t.textContent; if(c){const m=c.match(r); if(m?.[1]){log.info("idToken found.");log.debug(`Token: ${m[1].substring(0,20)}...`);return m[1];}}} log.error("idToken not found."); return null; }
   function base64ToBlob(b64, ct='') { try { const bc=atob(b64), ba=[]; for(let o=0;o<bc.length;o+=512){const s=bc.slice(o,o+512), bn=new Array(s.length); for(let i=0;i<s.length;i++){bn[i]=s.charCodeAt(i);} ba.push(new Uint8Array(bn));} return new Blob(ba,{type:ct}); } catch(e){log.error("B64->Blob Error:",e); return new Blob(["Err"],{type:"text/plain"});} }
   function triggerDownload(blob, fn) { try { const u=URL.createObjectURL(blob),a=document.createElement('a'); a.style.display='none';a.href=u;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u); log.info(`Download triggered: ${fn}`); } catch(e){log.error("Trigger DL Error:",e); alert("DL Error.");} }
+  
+  // --- Token Extraction Functions ---
+  function getCredentialIdToken () {
+    // Look through all script tags in the document
+    const scripts = document.querySelectorAll('script');
+    // Regex pattern to match idToken in serialized JSON
+    const regex = /\\"idToken\\":\\"([A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+)\\"/;
+    
+    for (const script of scripts) {
+        const content = script.textContent;
+        if (content) {
+            const match = content.match(regex);
+            if (match?.[1]) {
+                log.info("idToken found.");
+                log.debug(`Token: ${match[1].substring(0, 20)}...`);
+                return match[1];
+            }
+        }
+    }
+    
+    return null;
+  }
 
+  function get3rdAuthIdToken () {
+    const jwtPart1 =  __next_f[13][1].match(/(eyJ[\w|.]+)/)?.[0] || null;
+    if (!jwtPart1) {
+        return null;
+    }
+    const jwtPart2 = __next_f[14][1];
+    const jwt = jwtPart1 + jwtPart2;
+    return jwt;
+  }
+
+  function getIdTokenFromDom() {
+      log.debug("Searching for idToken...");
+      
+      const credentialIdToken = getCredentialIdToken();
+      if (credentialIdToken) {
+          log.info("idToken found in credentialIdToken.");
+          return credentialIdToken;
+      }
+
+      const thirdPartyIdToken = get3rdAuthIdToken();
+      if (thirdPartyIdToken) {
+          log.info("idToken found in third-party auth.");
+          return thirdPartyIdToken;
+      }
+      
+      // If we reach here, token wasn't found
+      log.error("idToken not found.");
+      return null;
+  }
 
   // --- JSZip Loading ---
   async function loadJszipFromCDNIfNeeded() {
