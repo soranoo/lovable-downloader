@@ -46,9 +46,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       downloadButton.disabled = false;
       helpTextElement.textContent = 'Click the button to download the entire project as a ZIP file.';
     } else {
-      tokenStatusElement.textContent = 'Not authenticated';
+      tokenStatusElement.textContent = 'Not authenticated / Using 3rd party auth';
       updateStatus('Authentication token not found', 'error');
-      helpTextElement.textContent = 'Please make sure you are logged in and reload the page.';
+      helpTextElement.textContent = 'Please make sure you are logged in and reload the page. If you are logged in using 3rd party providers, please check the in-page toolbar download button.';
+      log.info("CredentialIdToken not found, checking 3rd-party auth...");
     }
   } catch (error) {
     updateStatus('Could not communicate with page. Please reload.', 'error');

@@ -42,7 +42,9 @@ They rejected~.
 5. Switch on the extension.
 ![Screenshot](docs/images/screenshot-3.png)
 6. Reload the Loveable page.
-   
+
+> [!NOTE]\
+> If you are logged in using 3rd party providers (eg. Google, GitHub), please check the in-page toolbar download button. The download button in the extension may not work as expected due to the inability to obtain the ID token.
 
 #### Via Tampermonkey
 
