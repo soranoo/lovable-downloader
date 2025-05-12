@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Lovable Downloader (v1.13 - Fix 3rd-party token extraction)
+// @name         Lovable Downloader (v1.14 - Fix 3rd-party token extraction)
 // @namespace    https://github.com/soranoo/lovable-downloader
-// @version      1.13
+// @version      1.14
 // @description  Fix incorrect 3rd-party auth token extraction.
 // @author       Freeman (soranoo)
 // @match        https://lovable.dev/projects/*
@@ -170,11 +170,11 @@
     }
   
     function get3rdAuthIdToken () {
-      const jwtPart1 =  __next_f[13][1].match(/(eyJ[\w|.]+)/)?.[0] || null;
+      const jwtPart1 =  __next_f[12][1].match(/(eyJ[\w|.]+)/)?.[0] || null;
       if (!jwtPart1) {
           return null;
       }
-      const jwtPart2 = __next_f[14][1];
+      const jwtPart2 = __next_f[13][1];
       const jwt = jwtPart1 + jwtPart2;
       return jwt;
     }
