@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Lovable Downloader (v1.14 - Fix 3rd-party token extraction)
+// @name         Lovable Downloader (v1.1.3 - Fix 3rd-party token extraction)
 // @namespace    https://github.com/soranoo/lovable-downloader
-// @version      1.14
+// @version      1.1.3
 // @description  Fix incorrect 3rd-party auth token extraction.
 // @author       Freeman (soranoo)
 // @match        https://lovable.dev/projects/*
@@ -24,7 +24,7 @@
       debug: (msg, ...args) => { /* console.log(`${log.prefix} [DEBUG] ${msg}`, ...args); */ }
    };
 
-  log.info("Script starting v1.12 (Loading Indicator)...");
+  log.info("Script starting v1.1.3 (Loading Indicator)...");
 
   // --- Configuration Constants ---
   const API_BASE_URL = "https://lovable-api.com";
@@ -169,13 +169,33 @@
     return null;
   }
 
-  function get3rdAuthIdToken () {
-    const jwtPart1 =  __next_f[12][1].match(/(eyJ[\w|.]+)/)?.[0] || null;
-    if (!jwtPart1) {
-        return null;
+  function validateJwt (jwt) {
+    if (!jwt) {
+        return false;
     }
-    const jwtPart2 = __next_f[13][1];
-    const jwt = jwtPart1 + jwtPart2;
+    return /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/.test(jwt);
+  }
+
+  function get3rdAuthIdToken () {
+    const getPart1 = (s) => s.match(/(eyJ[\w|.|-]+)/)?.[0] || null;
+
+    // Method 1
+    let offset = 12;
+    let jwtPart1 = getPart1(__next_f[offset][1]);
+    if (!jwtPart1) {
+        // Method 2
+        offset = 13;
+        jwtPart1 = getPart1(__next_f[offset][1]);
+        if (!jwtPart1) {
+            return null;
+        }
+    }
+    const jwtPart2 = __next_f[offset + 1][1];
+    let jwt = jwtPart1 + jwtPart2;
+    if (!validateJwt(jwt)) {
+        // Method 3
+        jwt = jwtPart1;
+    }
     return jwt;
   }
 
