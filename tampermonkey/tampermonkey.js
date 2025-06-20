@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Lovable Downloader (v1.1.3 - Fix 3rd-party token extraction)
+// @name         Lovable Downloader (v1.1.4 - Fix nested button bug)
 // @namespace    https://github.com/soranoo/lovable-downloader
-// @version      1.1.3
+// @version      1.1.4
 // @description  Fix incorrect 3rd-party auth token extraction.
 // @author       Freeman (soranoo)
 // @match        https://lovable.dev/projects/*
@@ -31,7 +31,7 @@
   const SIDEBAR_CONTENT_SELECTOR = ".overflow-x-auto.p-2";
   const FILE_ENTRY_SELECTOR = 'div.group.flex.cursor-pointer.items-center';
   const TRIGGER_BUTTON_SELECTOR = 'button[aria-label="Code viewer"]';
-  const TOOLBAR_CONTAINER_SELECTOR = 'div.flex.items-center.gap-1\\.5';
+  const TOOLBAR_CONTAINER_SELECTOR = '.cursor-pointer';
   const DOWNLOAD_ALL_BUTTON_ID = 'lovable-download-all-button';
   const DOWNLOAD_ICON_CLASS = 'lovable-download-icon';
   const DOWNLOAD_ELEMENT_HIDDEN_CLASS = 'lovable-download-hidden';
@@ -317,7 +317,31 @@
 
   // --- DOM Manipulation & Event Handling ---
   function createDownloadAllButton() { if(document.getElementById(DOWNLOAD_ALL_BUTTON_ID))return document.getElementById(DOWNLOAD_ALL_BUTTON_ID); log.debug("Creating 'Download All' button element..."); const btn=document.createElement('button'); btn.id=DOWNLOAD_ALL_BUTTON_ID; btn.className="inline-flex items-center justify-center gap-1 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none bg-background hover:bg-primary/20 border border-border h-7 px-2 rounded-md py-1"; btn.type='button'; btn.title='Download All Project Files as ZIP'; const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('width','16');svg.setAttribute('height','16');svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','2'); svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round'); svg.classList.add('h-4','w-4',DOWNLOAD_ICON_CLASS); svg.innerHTML=`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>`; btn.appendChild(svg); btn.addEventListener('click',async(e)=>{e.stopPropagation(); log.info("Download All button clicked."); const dataReady=await ensureDataFetched(); if(!dataReady){log.error("DL All cancelled: Data fetch failed.");return;} const jszipReady=await loadJszipFromCDNIfNeeded(); if(!jszipReady){log.error("DL All cancelled: JSZip could not be loaded.");return;} await downloadFolderAsZip("");}); return btn; }
-  function injectDownloadAllButtonWhenReady() { if(document.getElementById(DOWNLOAD_ALL_BUTTON_ID)){log.debug("DL All button already injected.");return;} const triggerButton=document.querySelector(TRIGGER_BUTTON_SELECTOR); const targetToolbar=triggerButton?.closest(TOOLBAR_CONTAINER_SELECTOR); if(targetToolbar){log.info("Target toolbar found. Injecting DL All button..."); const dlAllBtn=createDownloadAllButton(); if(dlAllBtn){const refBtn=targetToolbar.querySelector('button > svg > defs')?.closest('button')||targetToolbar.querySelector('button > svg > path[fill-rule="evenodd"]')?.closest('button'); if(refBtn){refBtn.insertAdjacentElement('beforebegin',dlAllBtn);log.info("DL All injected before ref btn.");}else{targetToolbar.appendChild(dlAllBtn);log.info("DL All appended to toolbar.");}}}else{buttonInjectionRetries++; if(buttonInjectionRetries<=BUTTON_INJECTION_MAX_RETRIES){log.warn(`Toolbar not found. Retrying injection (${buttonInjectionRetries}/${BUTTON_INJECTION_MAX_RETRIES})...`);setTimeout(injectDownloadAllButtonWhenReady,BUTTON_INJECTION_RETRY_DELAY);}else{log.error("Max retries reached for DL All button injection.");}}}
+  function injectDownloadAllButtonWhenReady() { 
+    if(document.getElementById(DOWNLOAD_ALL_BUTTON_ID)){
+      log.debug("DL All button already injected.");
+      return;
+    } 
+    const cursorPointerElement = document.querySelector(TOOLBAR_CONTAINER_SELECTOR); 
+    const targetToolbar = cursorPointerElement?.parentElement;    if(targetToolbar){
+      log.info("Target toolbar found. Injecting DL All button..."); 
+      const dlAllBtn = createDownloadAllButton(); 
+      if(dlAllBtn){
+        const children = Array.from(targetToolbar.children);
+        const insertPosition = Math.min(2, children.length-1);
+        targetToolbar.insertBefore(dlAllBtn, children[insertPosition]);
+        log.info("DL All injected at second to last position.");
+      }
+    } else {
+      buttonInjectionRetries++; 
+      if(buttonInjectionRetries <= BUTTON_INJECTION_MAX_RETRIES){
+        log.warn(`Toolbar not found. Retrying injection (${buttonInjectionRetries}/${BUTTON_INJECTION_MAX_RETRIES})...`);
+        setTimeout(injectDownloadAllButtonWhenReady, BUTTON_INJECTION_RETRY_DELAY);
+      } else {
+        log.error("Max retries reached for DL All button injection.");
+      }
+    }
+  }
   function addDownloadIconsToFileEntries() { log.debug("Running add/update icon placeholders..."); const entries=document.querySelectorAll(FILE_ENTRY_SELECTOR); if(!entries.length){log.debug("No file entries found.");return;} const vis=shouldElementsBeVisible(); const svgPath=`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>`; entries.forEach(e=>{let svg=e.querySelector(`.${DOWNLOAD_ICON_CLASS}`);if(!svg){svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('width','16');svg.setAttribute('height','16');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','2');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.classList.add('shrink-0','h-4','w-4','ml-auto','text-muted-foreground',DOWNLOAD_ICON_CLASS,'opacity-50','hover:opacity-100','transition-opacity');svg.style.cursor='pointer';svg.innerHTML=svgPath;if(!vis)svg.classList.add(DOWNLOAD_ELEMENT_HIDDEN_CLASS);e.appendChild(svg);svg.addEventListener('click',handleDownloadClick);log.debug(`Added icon placeholder.`);}else{svg.classList.toggle(DOWNLOAD_ELEMENT_HIDDEN_CLASS,!vis);}});log.debug("Finished icon processing cycle."); }
   async function handleDownloadClick(event) { /* ... (calls ensureDataFetched -> handleDownloadLogic) ... */ event.stopPropagation(); const icon=event.currentTarget; const entry=icon.closest(FILE_ENTRY_SELECTOR); log.debug("Individual download icon clicked."); const dataReady=await ensureDataFetched(); if(!dataReady){log.error("DL cancelled: data fetch failed.");return;} const currentPath=entry?.getAttribute('data-path'); if(!currentPath){ const nameSpan=entry?.querySelector('span.truncate'); const name=nameSpan?.textContent?.trim(); const pI=name?Array.from(pathToItemMap.keys()).find(p=>p===name||p.endsWith(`/${name}`)):null; if(pI){log.warn(`Path resolved via fallback for "${name}"`);entry.setAttribute('data-path',pI);handleDownloadLogic(pI);}else{alert("DL failed: path unknown after fetch.");log.error("Path association failed completely:",entry);return;} } else { handleDownloadLogic(currentPath); } }
   async function handleDownloadLogic(currentPath) { /* ... (calls loadJszipIfNeeded -> downloadFolderAsZip) ... */ log.info(`Handling DL request for path: ${currentPath}`); const itemData = findSourceItem(currentPath); const isItemFolder = (itemData?.isImplicitFolder || isFolder(currentPath)); if (isItemFolder) { log.debug("Item is folder, ensuring JSZip..."); const jszipReady = await loadJszipFromCDNIfNeeded(); if (!jszipReady) { log.error("Folder DL cancelled: JSZip load failed."); alert("JSZip library failed."); return; } log.debug("JSZip ready for folder DL."); await downloadFolderAsZip(currentPath); } else if (itemData && typeof itemData.contents !== 'undefined') { log.debug("Item is file."); downloadFile(itemData); } else if (!itemData) { if(isFolder(currentPath)){log.warn("Folder check passed but itemData missing?"); await downloadFolderAsZip(currentPath);} else {log.error(`Item data not found: ${currentPath}`); alert("Cannot find data.");} } else { log.warn(`Item not downloadable: ${currentPath}`, itemData); alert("Item not downloadable."); } }
