@@ -15,17 +15,6 @@
 (function() {
   'use strict';
 
-  // --- Structured Logging ---
-  const log = {
-      prefix: '[Lovable Downloader]',
-      info: (msg, ...args) => console.log(`${log.prefix} ${msg}`, ...args),
-      warn: (msg, ...args) => console.warn(`${log.prefix} ${msg}`, ...args),
-      error: (msg, ...args) => console.error(`${log.prefix} ${msg}`, ...args),
-      debug: (msg, ...args) => { console.log(`${log.prefix} [DEBUG] ${msg}`, ...args); }
-   };
-
-  log.info("Script starting v1.1.3 (Loading Indicator)...");
-
   // --- Configuration Constants ---
   const API_BASE_URL = "https://lovable-api.com";
   const SIDEBAR_CONTENT_SELECTOR = ".overflow-x-auto.p-2";
@@ -40,6 +29,18 @@
   const JSZIP_CDN_URL = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
   const JSZIP_SCRIPT_ID = 'lovable-jszip-cdn-script';
   const LOADING_INDICATOR_ID = 'lovable-loading-indicator'; // ID for the indicator div
+  const IS_DEBBUG = false; // Set to true to enable debug logging
+
+  // --- Structured Logging ---
+  const log = {
+      prefix: '[Lovable Downloader]',
+      info: (msg, ...args) => console.log(`${log.prefix} ${msg}`, ...args),
+      warn: (msg, ...args) => console.warn(`${log.prefix} ${msg}`, ...args),
+      error: (msg, ...args) => console.error(`${log.prefix} ${msg}`, ...args),
+      debug: (msg, ...args) => {if (IS_DEBBUG) console.log(`${log.prefix} [DEBUG] ${msg}`, ...args); }
+   };
+
+  log.info("Script starting v1.1.5 (Loading Indicator)...");
 
   // --- Constants ---
   const JWT_REGEX = /eyJ[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/; // Regex to validate JWT structure
