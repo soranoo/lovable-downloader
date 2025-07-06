@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Lovable Downloader (v1.1.4 - Fix nested button bug)
+// @name         Lovable Downloader (v1.1.5 - Fix nested button bug)
 // @namespace    https://github.com/soranoo/lovable-downloader
-// @version      1.1.4
+// @version      1.1.5
 // @description  Fix incorrect 3rd-party auth token extraction.
 // @author       Freeman (soranoo)
 // @match        https://lovable.dev/projects/*
@@ -21,7 +21,7 @@
       info: (msg, ...args) => console.log(`${log.prefix} ${msg}`, ...args),
       warn: (msg, ...args) => console.warn(`${log.prefix} ${msg}`, ...args),
       error: (msg, ...args) => console.error(`${log.prefix} ${msg}`, ...args),
-      debug: (msg, ...args) => { /* console.log(`${log.prefix} [DEBUG] ${msg}`, ...args); */ }
+      debug: (msg, ...args) => { console.log(`${log.prefix} [DEBUG] ${msg}`, ...args); }
    };
 
   log.info("Script starting v1.1.3 (Loading Indicator)...");
@@ -40,6 +40,10 @@
   const JSZIP_CDN_URL = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
   const JSZIP_SCRIPT_ID = 'lovable-jszip-cdn-script';
   const LOADING_INDICATOR_ID = 'lovable-loading-indicator'; // ID for the indicator div
+
+  // --- Constants ---
+  const JWT_REGEX = /eyJ[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/; // Regex to validate JWT structure
+  const JWT_REGEX_STRICT = /^eyJ[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/; // Regex to validate JWT structure
 
   // --- Global State Variables ---
   let sourceCodeData = null;
@@ -173,49 +177,67 @@
     if (!jwt) {
         return false;
     }
-    return /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/.test(jwt);
+    return JWT_REGEX_STRICT.test(jwt);
   }
 
   function get3rdAuthIdToken () {
     const getPart1 = (s) => s.match(/(eyJ[\w|.|-]+)/)?.[0] || null;
+    const getFull = (s) => s.match(JWT_REGEX)?.[0] || null;
 
-    // Method 1
-    let offset = 12;
-    let jwtPart1 = getPart1(__next_f[offset][1]);
-    if (!jwtPart1) {
-        // Method 2
-        offset = 13;
-        jwtPart1 = getPart1(__next_f[offset][1]);
+    const method1 = () => {
+        // Method 1
+        let offset = 12;
+        let jwtPart1 = getPart1(__next_f[offset][1]);
         if (!jwtPart1) {
-            return null;
+            // Method 2
+            offset = 13;
+            jwtPart1 = getPart1(__next_f[offset][1]);
+            if (!jwtPart1) {
+                return null;
+            }
         }
+        const jwtPart2 = __next_f[offset + 1][1];
+        let jwt = jwtPart1 + jwtPart2;
+        if (!validateJwt(jwt)) {
+            // Method 3
+            jwt = jwtPart1;
+        }
+        return jwt;
     }
-    const jwtPart2 = __next_f[offset + 1][1];
-    let jwt = jwtPart1 + jwtPart2;
-    if (!validateJwt(jwt)) {
-        // Method 3
-        jwt = jwtPart1;
+
+    const method2 = () => {
+        // Method 4
+        const jwtFull = getFull(__next_f[14][1]);
+        if (jwtFull && validateJwt(jwtFull)) {
+            return jwtFull;
+        }
+        return null;
     }
+
+    let jwt = method1();
+    if (!jwt) {
+        jwt = method2();
+    }
+
     return jwt;
   }
 
   function getIdTokenFromDom() {
       log.debug("Searching for idToken...");
-      
       const credentialIdToken = getCredentialIdToken();
       if (credentialIdToken) {
           log.info("idToken found in credentialIdToken.");
           return credentialIdToken;
-      }
-
+        }
+        
+      log.debug("Checking 3rd-party auth...");
       const thirdPartyIdToken = get3rdAuthIdToken();
       if (thirdPartyIdToken) {
-          log.info("idToken found in third-party auth.");
+          log.info("Auth token found in third-party auth.");
           return thirdPartyIdToken;
       }
       
-      // If we reach here, token wasn't found
-      log.error("idToken not found.");
+      log.error("Auth token not found.");
       return null;
   }
 

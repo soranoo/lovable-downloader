@@ -1,6 +1,6 @@
 {
   "name": "Lovable Downloader",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "manifest_version": 3,
   "description": "Downloads source code from lovable.dev with a single click",
   "author": "Freeman (soranoo)",
