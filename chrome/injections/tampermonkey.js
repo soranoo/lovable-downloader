@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Lovable Downloader (v1.1.5 - Fix nested button bug)
+// @name         Lovable Downloader (v1.1.6 - Fix incorrect download all button position)
 // @namespace    https://github.com/soranoo/lovable-downloader
-// @version      1.1.5
+// @version      1.1.6
 // @description  Fix incorrect 3rd-party auth token extraction.
 // @author       Freeman (soranoo)
 // @match        https://lovable.dev/projects/*
@@ -20,7 +20,7 @@
   const SIDEBAR_CONTENT_SELECTOR = ".overflow-x-auto.p-2";
   const FILE_ENTRY_SELECTOR = 'div.group.flex.cursor-pointer.items-center';
   const TRIGGER_BUTTON_SELECTOR = 'button[aria-label="Code viewer"]';
-  const TOOLBAR_CONTAINER_SELECTOR = '.cursor-pointer';
+  const TOOLBAR_CONTAINER_SELECTOR = 'button.cursor-pointer';
   const DOWNLOAD_ALL_BUTTON_ID = 'lovable-download-all-button';
   const DOWNLOAD_ICON_CLASS = 'lovable-download-icon';
   const DOWNLOAD_ELEMENT_HIDDEN_CLASS = 'lovable-download-hidden';
