@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Lovable Downloader (v1.1.6 - Fix incorrect download all button position)
+// @name         Lovable Downloader (v1.1.7 - Fix 3rd-party Auth Token Not Found)
 // @namespace    https://github.com/soranoo/lovable-downloader
-// @version      1.1.6
+// @version      1.1.7
 // @description  Fix incorrect 3rd-party auth token extraction.
 // @author       Freeman (soranoo)
 // @match        https://lovable.dev/projects/*
@@ -40,7 +40,7 @@
       debug: (msg, ...args) => {if (IS_DEBBUG) console.log(`${log.prefix} [DEBUG] ${msg}`, ...args); }
    };
 
-  log.info("Script starting v1.1.5 (Loading Indicator)...");
+  log.info("Script starting v1.1.7 (Loading Indicator)...");
 
   // --- Constants ---
   const JWT_REGEX = /eyJ[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/; // Regex to validate JWT structure
@@ -215,9 +215,21 @@
         return null;
     }
 
+    const method3 = () => {
+        // Method 5
+        const jwtFull = getFull(__next_f[16][1]);
+        if (jwtFull && validateJwt(jwtFull)) {
+            return jwtFull;
+        }
+        return null;
+    }
+
     let jwt = method1();
     if (!jwt) {
         jwt = method2();
+    }
+    if (!jwt) {
+        jwt = method3();
     }
 
     return jwt;
