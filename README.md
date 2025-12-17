@@ -34,7 +34,7 @@ They rejected~.
 1. Clone the repository.
 
    ```bash
-   git clone https://github.com/soranoo/loveable-downloader.git
+   git clone https://github.com/soranoo/lovable-downloader.git
    ```
 2. Open Chrome and go to `chrome://extensions/`.
 3. Enable "Developer mode" in the top right corner.
